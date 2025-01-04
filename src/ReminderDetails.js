@@ -43,7 +43,7 @@ const ReminderDetails = () => {
       {reminder && (
         <article>
           <h2>{reminder.title}</h2>
-          <p>Date: X</p>
+          <p>Date: {reminder.date}</p>
           <div>{reminder.body}</div>
           <button onClick={() => setShowDialog(true)}>Delete</button>
         </article>

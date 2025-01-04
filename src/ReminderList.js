@@ -9,7 +9,7 @@ const ReminderList = ({ reminders, title }) => {
         <div className="reminder-preview" key={reminder.id}>
           <Link to={`/reminders/${reminder.id}`}>
             <h2>{reminder.title}</h2>
-            <p>Date: X</p>
+            <p>Date: {reminder.date}</p>
           </Link>
         </div>
       ))}

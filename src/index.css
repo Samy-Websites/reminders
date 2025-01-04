@@ -180,3 +180,27 @@
 .cancel-btn:hover {
   background-color: #b3b3b3;
 }
+
+input[type="date"] {
+  width: 100%;
+  padding: 8px 12px;
+  margin: 10px 0;
+  border: 1px solid #f1356d; /* Matching the theme's primary color */
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-family: "Quicksand", sans-serif;
+  font-size: 14px;
+  color: #333;
+  background-color: #fff; /* White background for a clean look */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type="date"]:focus {
+  outline: none;
+  border-color: #f1356d; /* Accent color on focus */
+  box-shadow: 0 0 5px rgba(241, 53, 109, 0.5); /* Subtle shadow to emphasize focus */
+}
+
+input[type="date"]::placeholder {
+  color: #999;
+}

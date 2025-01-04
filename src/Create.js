@@ -4,21 +4,22 @@ import { useHistory } from "react-router-dom";
 const Create = () => {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [category, setCategory] = useState("Birthday"); // This means Birthday is the default option
+  const [date, setDate] = useState("");
   const [isPending, setIsPending] = useState(false);
   const history = useHistory();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const reminder = { title, body, category };
+    const reminder = { title, body, date };
 
     setIsPending(true);
 
     fetch("http://localhost:8000/reminders", {
       method: "POST",
-      headers: { "Content-Type": "applications/json" },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(reminder),
     }).then(() => {
+      console.log("New reminder added");
       setIsPending(false);
       history.push("/");
     });
@@ -35,20 +36,21 @@ const Create = () => {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
-        <label>Reminder body:</label>
+        <label>Reminder Body:</label>
         <textarea
           required
           value={body}
           onChange={(e) => setBody(e.target.value)}
         ></textarea>
-        <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          <option value="Birthday">Birthday</option>
-          <option value="Appointment">Appointment</option>
-          <option value="Event">Event</option>
-        </select>
-        <label>Reminder Date: X (Implement this later)</label> <br />
+        <label>Reminder Date:</label>
+        <input
+          type="date"
+          required
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+        />
         {!isPending && <button>Add Reminder</button>}
-        {isPending && <button disabled>Add Reminder</button>}
+        {isPending && <button disabled>Adding Reminder...</button>}
       </form>
     </div>
   );
