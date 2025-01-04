@@ -4,49 +4,43 @@
       "title": "Sabrina's Birthday",
       "body": "Wish him/her a happy birthday",
       "category": "Birthday",
-      "id": 1
+      "id": "1"
     },
     {
       "title": "Lina's Birthday",
       "body": "Wish him/her a happy birthday",
       "category": "Birthday",
-      "id": 2
+      "id": "2"
     },
     {
       "title": "Sirine's Birthday",
       "body": "Wish him/her a happy birthday",
       "category": "Birthday",
-      "id": 3
+      "id": "3"
     },
     {
       "title": "Dentist Appointment",
       "body": "PPalladium appmnt on day X",
       "category": "Appointment",
-      "id": 4
-    },
-    {
-      "title": "Physio Appointment",
-      "body": "March physio appmnt on day X",
-      "category": "Appointment",
-      "id": 5
+      "id": "4"
     },
     {
       "title": "CUSEC Event",
       "body": "go to cusec event in montreal, sheraton downtown....",
       "category": "Event",
-      "id": 6
-    },
-    {
-      "id": "3b1b",
-      "title": "Meriem bday",
-      "body": "July 17th",
-      "category": "Birthday"
+      "id": "6"
     },
     {
       "id": "a192",
       "title": "New reminder",
       "body": "reminder body",
       "category": "Appointment"
+    },
+    {
+      "id": "79d4",
+      "title": "Meriem bday",
+      "body": "17 juillet",
+      "category": "Birthday"
     }
   ]
 }
