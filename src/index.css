@@ -205,3 +205,14 @@
 .cancel-btn:hover {
   background-color: #b3b3b3;
 }
+
+.button-group {
+  display: flex;
+  gap: 10px; /* Adjust the spacing between buttons */
+  margin-top: 15px; /* Optional: Add some space between buttons and content above */
+}
+
+.button-group button {
+  flex: 1; /* Optional: Make buttons evenly sized */
+  padding: 8px 12px; /* Ensure consistent padding */
+}

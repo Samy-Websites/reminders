@@ -91,8 +91,10 @@ const ReminderDetails = () => {
               <p>Date: {reminder.date}</p>
               <p>Category: {reminder.category}</p>
               <div>{reminder.body}</div>
-              <button onClick={handleEdit}>Edit</button>
-              <button onClick={() => setShowDialog(true)}>Delete</button>
+              <div className="button-group">
+                <button onClick={handleEdit}>Edit</button>
+                <button onClick={() => setShowDialog(true)}>Delete</button>
+              </div>
             </article>
           )}
           {showDialog && (
