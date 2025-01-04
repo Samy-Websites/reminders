@@ -23,23 +23,17 @@ const ConfirmationDialog = ({ message, onConfirm, onCancel }) => {
 };
 
 const parseDateToLocal = (dateString) => {
-  console.log("Raw date from database:", dateString);
   const [year, month, day] = dateString.split("-");
-  const localDate = new Date(year, month - 1, day); // Create local date
-  console.log("Parsed local date:", localDate);
-  return localDate;
+  return new Date(year, month - 1, day); // Create local date
 };
 
 const formatDateToUTCString = (date) => {
-  if (!date) {
-    console.log("No date provided to format.");
-    return null;
-  }
-  const utcString = `${date.getFullYear()}-${String(
-    date.getMonth() + 1
-  ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-  console.log("Formatted date for save:", utcString);
-  return utcString;
+  return date
+    ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+        2,
+        "0"
+      )}-${String(date.getDate()).padStart(2, "0")}`
+    : null;
 };
 
 const ReminderDetails = () => {
@@ -48,37 +42,24 @@ const ReminderDetails = () => {
   const { id } = useParams();
   const { data: reminder, error, isPending } = useFetch(db + id);
 
-  const [showDialog, setShowDialog] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [category, setCategory] = useState("");
   const [date, setDate] = useState(null);
-
-  const handleDelete = () => {
-    fetch(db + reminder.id, {
-      method: "DELETE",
-    }).then(() => {
-      history.push("/");
-    });
-  };
+  const [isEditing, setIsEditing] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+  const [saveDialog, setSaveDialog] = useState(false);
 
   const handleEdit = () => {
     setIsEditing(true);
     setTitle(reminder.title);
     setBody(reminder.body);
     setCategory(reminder.category);
-
-    const parsedDate = reminder.date ? parseDateToLocal(reminder.date) : null;
-    console.log("Date set for DatePicker:", parsedDate);
-    setDate(parsedDate);
+    setDate(reminder.date ? parseDateToLocal(reminder.date) : null);
   };
 
   const handleSave = () => {
     const formattedDate = formatDateToUTCString(date);
-    console.log("Saving reminder with date:", formattedDate);
-
     const updatedReminder = { title, body, category, date: formattedDate };
 
     fetch(db + reminder.id, {
@@ -87,25 +68,45 @@ const ReminderDetails = () => {
       body: JSON.stringify(updatedReminder),
     }).then(() => {
       setIsEditing(false);
-      history.push(`/reminders/${id}`);
+      setSaveDialog(false);
+      history.go(0); // Reload to reflect changes
+    });
+  };
+
+  const handleDelete = () => {
+    fetch(db + reminder.id, { method: "DELETE" }).then(() => {
+      history.push("/");
     });
   };
 
   return (
-    <div className="reminder-details">
-      {isPending && <div>Loading...</div>}
-      {error && <div>{error}</div>}
-      {!isEditing && reminder && (
-        <article>
-          <h2>{reminder.title}</h2>
-          <p>Date: {reminder.date}</p>
-          <p>Category: {reminder.category}</p>
-          <div>{reminder.body}</div>
-          <button onClick={handleEdit}>Edit</button>
-          <button onClick={() => setShowDialog(true)}>Delete</button>
-        </article>
-      )}
-      {isEditing && (
+    <>
+      {!isEditing ? (
+        <div className="reminder-details">
+          {isPending && <div>Loading...</div>}
+          {error && <div>{error}</div>}
+          {!isPending && reminder && (
+            <article>
+              <h2>{reminder.title}</h2>
+              <p>Date: {reminder.date}</p>
+              <p>Category: {reminder.category}</p>
+              <div>{reminder.body}</div>
+              <button onClick={handleEdit}>Edit</button>
+              <button onClick={() => setShowDialog(true)}>Delete</button>
+            </article>
+          )}
+          {showDialog && (
+            <ConfirmationDialog
+              message="Are you sure you want to delete this reminder?"
+              onConfirm={() => {
+                handleDelete();
+                setShowDialog(false);
+              }}
+              onCancel={() => setShowDialog(false)}
+            />
+          )}
+        </div>
+      ) : (
         <div className="create">
           <h2>Edit Reminder</h2>
           <form>
@@ -118,7 +119,6 @@ const ReminderDetails = () => {
             />
             <label>Reminder Body:</label>
             <textarea
-              placeholder="Optional"
               value={body}
               onChange={(e) => setBody(e.target.value)}
             ></textarea>
@@ -135,47 +135,28 @@ const ReminderDetails = () => {
             <div className="date-picker-container">
               <DatePicker
                 selected={date}
-                onChange={(selectedDate) => {
-                  console.log("Date selected in DatePicker:", selectedDate);
-                  setDate(selectedDate);
-                }}
+                onChange={(selectedDate) => setDate(selectedDate)}
                 dateFormat="yyyy-MM-dd"
                 className="custom-datepicker"
               />
-            </div>
-            <div className="button-group">
-              <button type="button" onClick={() => setShowDialog(true)}>
+              <button type="button" onClick={() => setSaveDialog(true)}>
                 Save
               </button>
-              <button
-                type="button"
-                onClick={() => history.push(`/reminders/${id}`)}
-              >
+              <button type="button" onClick={() => setIsEditing(false)}>
                 Cancel
               </button>
             </div>
           </form>
+          {saveDialog && (
+            <ConfirmationDialog
+              message="Are you sure you want to save changes?"
+              onConfirm={handleSave}
+              onCancel={() => setSaveDialog(false)}
+            />
+          )}
         </div>
       )}
-      {showDialog && (
-        <ConfirmationDialog
-          message={
-            isEditing
-              ? "Are you sure you want to save changes?"
-              : "Are you sure you want to delete this reminder?"
-          }
-          onConfirm={() => {
-            if (isEditing) {
-              handleSave();
-            } else {
-              handleDelete();
-            }
-            setShowDialog(false);
-          }}
-          onCancel={() => setShowDialog(false)}
-        />
-      )}
-    </div>
+    </>
   );
 };
 

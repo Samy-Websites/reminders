@@ -52,6 +52,7 @@ const Create = () => {
           value={body}
           onChange={(e) => setBody(e.target.value)}
         ></textarea>
+        <label>Category:</label>
         <select value={category} onChange={(e) => setCategory(e.target.value)}>
           <option value="Birthday">Birthday</option>
           <option value="Appointment">Appointment</option>
