@@ -1,16 +1,19 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css"; // Import default styles
 
 const Create = () => {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(null); // Date object for the picker
   const [isPending, setIsPending] = useState(false);
   const history = useHistory();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const reminder = { title, body, date };
+    const formattedDate = date ? date.toISOString().split("T")[0] : null; // Format to YYYY-MM-DD
+    const reminder = { title, body, date: formattedDate };
 
     setIsPending(true);
 
@@ -43,14 +46,16 @@ const Create = () => {
           onChange={(e) => setBody(e.target.value)}
         ></textarea>
         <label>Reminder Date:</label>
-        <input
-          type="date"
-          required
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
-        {!isPending && <button>Add Reminder</button>}
-        {isPending && <button disabled>Adding Reminder...</button>}
+        <div className="date-picker-container">
+          <DatePicker
+            selected={date}
+            onChange={(selectedDate) => setDate(selectedDate)}
+            dateFormat="yyyy-MM-dd"
+            className="custom-datepicker"
+          />
+          {!isPending && <button>Add Reminder</button>}
+          {isPending && <button disabled>Adding Reminder...</button>}
+        </div>
       </form>
     </div>
   );

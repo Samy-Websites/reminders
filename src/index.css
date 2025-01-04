@@ -204,3 +204,74 @@ input[type="date"]:focus {
 input[type="date"]::placeholder {
   color: #999;
 }
+
+/* Date Picker Input Styling */
+.custom-datepicker {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #f1356d;
+  border-radius: 8px;
+  font-family: "Quicksand", sans-serif;
+  font-size: 14px;
+  color: #333;
+  background-color: #fff;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.custom-datepicker:focus {
+  outline: none;
+  border-color: #f1356d;
+  box-shadow: 0 0 5px rgba(241, 53, 109, 0.5);
+}
+
+/* Calendar Popup Styling */
+.react-datepicker {
+  font-family: "Quicksand", sans-serif;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.react-datepicker__header {
+  background-color: #f1356d;
+  color: white;
+  border-bottom: 1px solid #ddd;
+  padding-top: 10px;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: #f1356d;
+  color: white;
+  border-radius: 50%;
+}
+
+.react-datepicker__day:hover {
+  background-color: rgba(241, 53, 109, 0.8);
+  color: white;
+  border-radius: 50%;
+}
+
+.date-picker-container {
+  display: flex;
+  align-items: center; /* Aligns the date picker and button vertically */
+  gap: 10px; /* Adds spacing between the date picker and the button */
+}
+
+.custom-datepicker {
+  flex: 1; /* Ensures the date input takes available width */
+}
+
+.date-picker-container button {
+  background: #f1356d;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.date-picker-container button:hover {
+  background: #d12d4e;
+}

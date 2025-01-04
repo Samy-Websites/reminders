@@ -1,13 +1,6 @@
 {
   "reminders": [
     {
-      "title": "Sabrina's Birthday",
-      "body": "Wish him/her a happy birthday",
-      "category": "Birthday",
-      "id": "1",
-      "date": "2025-01-10"
-    },
-    {
       "title": "Lina's Birthday",
       "body": "Wish him/her a happy birthday",
       "category": "Birthday",
@@ -47,6 +40,12 @@
       "title": "Malick's Birthday",
       "body": "That day is Malick's Birthday, we was born on January 25th, 2002.",
       "date": "2025-01-25"
+    },
+    {
+      "id": "b42c",
+      "title": "Sab bday",
+      "body": "mai",
+      "date": "2025-05-28"
     }
   ]
 }
