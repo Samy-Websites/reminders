@@ -13,7 +13,13 @@ const Create = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const formattedDate = date ? date.toISOString().split("T")[0] : null; // Format to YYYY-MM-DD
+    const formattedDate = date
+      ? `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(
+          2,
+          "0"
+        )}-${String(date.getUTCDate()).padStart(2, "0")}`
+      : null;
+
     const reminder = { title, body, category, date: formattedDate };
 
     setIsPending(true);
