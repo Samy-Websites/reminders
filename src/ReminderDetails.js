@@ -44,6 +44,7 @@ const ReminderDetails = () => {
         <article>
           <h2>{reminder.title}</h2>
           <p>Date: {reminder.date}</p>
+          <p>Category: {reminder.category}</p>
           <div>{reminder.body}</div>
           <button onClick={() => setShowDialog(true)}>Delete</button>
         </article>

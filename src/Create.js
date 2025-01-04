@@ -6,6 +6,7 @@ import "react-datepicker/dist/react-datepicker.css"; // Import default styles
 const Create = () => {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [category, setCategory] = useState("Birthday"); // This means Birthday is the default option
   const [date, setDate] = useState(null); // Date object for the picker
   const [isPending, setIsPending] = useState(false);
   const history = useHistory();
@@ -13,7 +14,7 @@ const Create = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const formattedDate = date ? date.toISOString().split("T")[0] : null; // Format to YYYY-MM-DD
-    const reminder = { title, body, date: formattedDate };
+    const reminder = { title, body, category, date: formattedDate };
 
     setIsPending(true);
 
@@ -41,10 +42,15 @@ const Create = () => {
         />
         <label>Reminder Body:</label>
         <textarea
-          required
+          placeholder="Optional"
           value={body}
           onChange={(e) => setBody(e.target.value)}
         ></textarea>
+        <select value={category} onChange={(e) => setCategory(e.target.value)}>
+          <option value="Birthday">Birthday</option>
+          <option value="Appointment">Appointment</option>
+          <option value="Event">Event</option>
+        </select>
         <label>Reminder Date:</label>
         <div className="date-picker-container">
           <DatePicker
