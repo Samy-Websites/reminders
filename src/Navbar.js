@@ -9,6 +9,7 @@ const Navbar = () => {
       </h1>
       <div className="links">
         <Link to="/">Home</Link>
+        <Link to="/subscribe">Subscribe</Link>
         <Link to="/contact">Contact</Link>
         <Link className="reminderlink" to="/create">
           New Reminder

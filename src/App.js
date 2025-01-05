@@ -5,6 +5,7 @@ import Create from "./Create";
 import Contact from "./Contact";
 import ReminderDetails from "./ReminderDetails";
 import NotFound from "./NotFound";
+import Subscribe from "./Subscribe";
 
 function App() {
   return (
@@ -18,6 +19,9 @@ function App() {
             </Route>
             <Route path="/contact">
               <Contact />
+            </Route>
+            <Route path="/subscribe">
+              <Subscribe />
             </Route>
             <Route path="/create">
               <Create />
