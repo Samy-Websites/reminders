@@ -12,6 +12,10 @@ Install dependency for routing
 
 To connect to the json file that acts as a database
 
+### `node server.js`
+
+Run the server
+
 ### `npm run start`
 
 To run the application

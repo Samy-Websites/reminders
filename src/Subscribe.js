@@ -9,15 +9,36 @@ const Subscribe = () => {
   const handleSubmit = () => {
     setIsPending(true);
 
-    // Simulate subscription process
-    setTimeout(() => {
-      console.log("User subscribed:", { name, email });
-      setName("");
-      setEmail("");
-      setIsPending(false);
-      setShowConfirm(false);
-      alert("Thank you for subscribing!");
-    }, 1000);
+    const subscriptionData = { name, email };
+
+    // Send data to the backend
+    fetch("http://localhost:5000/subscribe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(subscriptionData),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          return response.json().then((data) => {
+            throw new Error(data.message || "Failed to subscribe");
+          });
+        }
+        return response.json(); // Parse JSON if response is OK
+      })
+      .then((data) => {
+        alert("Subscription successful! Check your email.");
+        console.log("Preview URL:", data.previewUrl); // Log the Ethereal preview URL
+        setName("");
+        setEmail("");
+      })
+      .catch((error) => {
+        console.error("Error:", error.message);
+        alert(error.message);
+      })
+      .finally(() => {
+        setIsPending(false);
+        setShowConfirm(false);
+      });
   };
 
   const handleFormSubmit = (e) => {
