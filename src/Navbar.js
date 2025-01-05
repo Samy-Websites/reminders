@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import Contact from "./Contact";
 
 const Navbar = () => {
   return (
@@ -8,6 +9,7 @@ const Navbar = () => {
       </h1>
       <div className="links">
         <Link to="/">Home</Link>
+        <Link to="/contact">Contact</Link>
         <Link className="reminderlink" to="/create">
           New Reminder
         </Link>

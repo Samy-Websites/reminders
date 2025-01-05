@@ -29,30 +29,23 @@
       "date": "2025-07-17"
     },
     {
-      "title": "Malick's Birthday YAAAAAY",
-      "body": "That day is Malick's Birthday, we was born on January 25th, 2002. he turns 23 this year",
-      "category": "Event",
-      "date": "2025-01-25",
-      "id": "4cc6"
-    },
-    {
-      "id": "b42c",
       "title": "Sab bday",
       "body": "mai",
-      "date": "2025-05-28"
+      "date": "2026-05-28",
+      "id": "b42c"
     },
     {
-      "id": "7d6f",
       "title": "11111",
-      "body": "22222",
+      "body": "333",
       "category": "Birthday",
-      "date": "2025-01-04"
+      "date": "2025-01-04",
+      "id": "7d6f"
     },
     {
       "title": "Newggggg",
       "body": "trialdddd",
       "category": "Event",
-      "date": "2025-01-20",
+      "date": "2025-01-08",
       "id": "e8d0"
     }
   ]
