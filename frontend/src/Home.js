@@ -1,9 +1,9 @@
 import ReminderList from "./ReminderList";
 import useFetch from "./useFetch";
-import BASE_URL from "./Config";
+import REMINDERS_URL from "./Config";
 
 const Home = () => {
-  const { data: reminders, isPending, error } = useFetch(BASE_URL);
+  const { data: reminders, isPending, error } = useFetch(REMINDERS_URL);
 
   return (
     <div className="home">

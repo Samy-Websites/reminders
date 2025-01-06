@@ -3,7 +3,7 @@ import useFetch from "./useFetch";
 import { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import BASE_URL from "./Config";
+import REMINDERS_URL from "./Config";
 
 const ConfirmationDialog = ({ message, onConfirm, onCancel }) => {
   return (
@@ -38,7 +38,7 @@ const formatDateToUTCString = (date) => {
 };
 
 const ReminderDetails = () => {
-  const db = BASE_URL;
+  const db = REMINDERS_URL;
   const { id } = useParams();
   const { data: reminder, error, isPending } = useFetch(`${db}/${id}`);
 

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"; // Import default styles
-import BASE_URL from "./Config";
+import REMINDERS_URL from "./Config";
 
 const Create = () => {
   const [title, setTitle] = useState("");
@@ -25,7 +25,7 @@ const Create = () => {
 
     setIsPending(true);
 
-    fetch(BASE_URL, {
+    fetch(REMINDERS_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(reminder),
