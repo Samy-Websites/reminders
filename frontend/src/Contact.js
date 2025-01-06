@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import emailjs from "@emailjs/browser";
 
 const Contact = () => {
@@ -8,7 +8,7 @@ const Contact = () => {
   const [message, setMessage] = useState("");
   const [isPending, setIsPending] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const history = useHistory();
+  const history = useNavigate();
 
   const handleSubmit = () => {
     // e.preventDefault() // Not sure if I need this

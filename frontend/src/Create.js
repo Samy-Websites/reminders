@@ -1,15 +1,16 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"; // Import default styles
+import BASE_URL from "./Config";
 
 const Create = () => {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [category, setCategory] = useState("Birthday"); // This means Birthday is the default option
+  const [category, setCategory] = useState("Birthday"); // Default option
   const [date, setDate] = useState(null); // Date object for the picker
   const [isPending, setIsPending] = useState(false);
-  const history = useHistory();
+  const navigate = useNavigate(); // Replaces history.push in React Router v6
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -24,14 +25,14 @@ const Create = () => {
 
     setIsPending(true);
 
-    fetch("http://localhost:8000/reminders", {
+    fetch(BASE_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(reminder),
     }).then(() => {
       console.log("New reminder added");
       setIsPending(false);
-      history.push("/");
+      navigate("/"); // Navigate to the homepage after adding a reminder
     });
   };
 

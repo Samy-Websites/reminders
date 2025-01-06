@@ -1,8 +1,9 @@
-import { useHistory, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useFetch from "./useFetch";
 import { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import BASE_URL from "./Config";
 
 const ConfirmationDialog = ({ message, onConfirm, onCancel }) => {
   return (
@@ -37,10 +38,9 @@ const formatDateToUTCString = (date) => {
 };
 
 const ReminderDetails = () => {
-  const db = "http://localhost:8000/reminders/";
-  const history = useHistory();
+  const db = BASE_URL;
   const { id } = useParams();
-  const { data: reminder, error, isPending } = useFetch(db + id);
+  const { data: reminder, error, isPending } = useFetch(`${db}/${id}`);
 
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -49,6 +49,8 @@ const ReminderDetails = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [saveDialog, setSaveDialog] = useState(false);
+
+  const navigate = useNavigate(); // Initialize navigate
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -62,20 +64,20 @@ const ReminderDetails = () => {
     const formattedDate = formatDateToUTCString(date);
     const updatedReminder = { title, body, category, date: formattedDate };
 
-    fetch(db + reminder.id, {
+    fetch(`${db}/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedReminder),
     }).then(() => {
       setIsEditing(false);
       setSaveDialog(false);
-      history.go(0); // Reload to reflect changes
+      navigate(0); // Reload the current page to reflect changes
     });
   };
 
   const handleDelete = () => {
-    fetch(db + reminder.id, { method: "DELETE" }).then(() => {
-      history.push("/");
+    fetch(`${db}/${id}`, { method: "DELETE" }).then(() => {
+      navigate(-1); // Reload the current page to reflect changes
     });
   };
 

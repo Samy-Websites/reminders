@@ -1,12 +1,9 @@
 import ReminderList from "./ReminderList";
 import useFetch from "./useFetch";
+import BASE_URL from "./Config";
 
 const Home = () => {
-  const {
-    data: reminders,
-    isPending,
-    error,
-  } = useFetch("http://localhost:8000/reminders");
+  const { data: reminders, isPending, error } = useFetch(BASE_URL);
 
   return (
     <div className="home">

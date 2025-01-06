@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import BASE_URL from "./Config";
 
 const Subscribe = () => {
   const [name, setName] = useState("");
@@ -12,7 +13,7 @@ const Subscribe = () => {
     const subscriptionData = { name, email };
 
     // Send data to the backend
-    fetch("http://localhost:5000/subscribe", {
+    fetch(BASE_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(subscriptionData),
