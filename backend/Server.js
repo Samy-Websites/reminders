@@ -1,3 +1,6 @@
+/************************************************************
+ * server.js
+ ************************************************************/
 const express = require("express");
 const nodemailer = require("nodemailer");
 const bodyParser = require("body-parser");
@@ -10,7 +13,8 @@ const path = require("path");
 const app = express();
 const PORT = 5000;
 
-console.log("Database Path:", config.dbPath); // Logs the absolute path for debugging
+// Logs the database path (debugging)
+console.log("Database Path:", config.dbPath);
 
 // Path to subscribers.json
 const subscribersPath = path.join(__dirname, "data", "subscribers.json");
@@ -19,13 +23,13 @@ const subscribersPath = path.join(__dirname, "data", "subscribers.json");
 app.use(cors());
 app.use(bodyParser.json());
 
-// Set up Ethereal transporter
+// -- Remove environment variable usage and define credentials here (as shown in your original code) -- //
 const transporter = nodemailer.createTransport({
-  host: "smtp.ethereal.email",
-  port: 587,
+  host: "smtp.ethereal.email", // your SMTP host
+  port: 587, // your SMTP port
   auth: {
-    user: "tyreek.langworth43@ethereal.email",
-    pass: "dpSVEhCTJ3Wqrmnhy1",
+    user: "tyreek.langworth43@ethereal.email", // your test user
+    pass: "dpSVEhCTJ3Wqrmnhy1", // your test password
   },
 });
 
@@ -34,6 +38,7 @@ app.post("/subscribe", async (req, res) => {
   console.log("POST /subscribe called");
   const { name, email } = req.body;
 
+  // Basic validation
   if (!name || !email) {
     console.log("Missing name or email");
     return res.status(400).json({ error: "Name and email are required." });
@@ -124,13 +129,15 @@ app.delete("/subscribe/:email", (req, res) => {
     }
 
     // Find the subscriber
-    const subscriber = subscribers.find(
-      (subscriber) => subscriber.email === email
-    );
+    const subscriber = subscribers.find((entry) => entry.email === email);
 
-    const user = subscriber.name;
+    console.log("LOOKING FOR:", email);
+    console.log("All subscribers:", subscribers);
+    console.log("Found subscriber:", subscriber);
 
-    console.log("Subscriber object retrieved:", subscriber); // Log the subscriber object
+    // Safely get the subscriber's name with fallback
+    const userName =
+      subscriber && subscriber.name ? subscriber.name : "Subscriber";
 
     if (!subscriber) {
       console.log("Email not found in subscribers list:", email);
@@ -138,7 +145,7 @@ app.delete("/subscribe/:email", (req, res) => {
     }
 
     const updatedSubscribers = subscribers.filter(
-      (subscriber) => subscriber.email !== email
+      (entry) => entry.email !== email
     );
 
     fs.writeFile(
@@ -159,7 +166,8 @@ app.delete("/subscribe/:email", (req, res) => {
           from: '"Reminders App" <no-reply@reminders.com>',
           to: email,
           subject: "Goodbye from Reminders!",
-          html: `<p>Hi <b>${user}</b>, thank you for subscribing to Reminders!</p>`,
+          html: `<p>Hi <b>${userName}</b>,</p>
+                 <p>We're sorry to see you go. You can always subscribe again if you change your mind!</p>`,
         };
 
         transporter.sendMail(mailOptions, (err, info) => {
@@ -192,10 +200,10 @@ app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 
+// Route to get the full subscribers list
 app.get("/subscribe", (req, res) => {
   console.log("GET /subscribe called");
 
-  // Read the subscribers file
   fs.readFile(subscribersPath, "utf8", (err, data) => {
     if (err) {
       console.error("Error reading subscribers file:", err);
@@ -215,6 +223,7 @@ app.get("/subscribe", (req, res) => {
   });
 });
 
+// Route to manually send a farewell email
 app.post("/subscribe/send-farewell", (req, res) => {
   const { email, name } = req.body;
 
@@ -223,7 +232,7 @@ app.post("/subscribe/send-farewell", (req, res) => {
     from: '"Reminders App" <no-reply@reminders.com>',
     to: email,
     subject: "Goodbye from Reminders!",
-    html: `<p>Hi {<b>${name || "Subscriber"}}</b>,</p>
+    html: `<p>Hi <b>${name || "Subscriber"}</b>,</p>
            <p>We're sorry to see you go. You can always subscribe again if you change your mind!</p>`,
   };
 
