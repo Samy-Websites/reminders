@@ -6,6 +6,7 @@ const Subscribe = () => {
   const [email, setEmail] = useState("");
   const [isPending, setIsPending] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [deleteEmail, setDeleteEmail] = useState(""); // For deletion
 
   const handleSubmit = () => {
     console.log("Subscription confirmed."); // Log when subscription starts
@@ -35,7 +36,6 @@ const Subscribe = () => {
       .then((data) => {
         console.log("Subscription successful:", data); // Log the success response
         alert("Subscription successful! Check your email.");
-        console.log("Preview URL (if available):", data.previewUrl); // Log email preview URL
         setName("");
         setEmail("");
       })
@@ -47,6 +47,41 @@ const Subscribe = () => {
         console.log("Subscription process completed."); // Log when the process ends
         setIsPending(false);
         setShowConfirm(false);
+      });
+  };
+
+  const handleDelete = () => {
+    console.log("Deletion requested for email:", deleteEmail); // Log deletion request
+    setIsPending(true);
+
+    // Send DELETE request to the backend
+    fetch(`${SUBSCRIBERS_URL}/${deleteEmail}`, {
+      method: "DELETE",
+    })
+      .then((response) => {
+        console.log("Delete response received:", response); // Log delete response
+
+        if (!response.ok) {
+          console.error("Failed to delete:", response.statusText); // Log failed deletion
+          return response.json().then((data) => {
+            throw new Error(data.error || "Failed to delete email");
+          });
+        }
+
+        return response.json(); // Parse JSON if response is OK
+      })
+      .then((data) => {
+        console.log("Deletion successful:", data); // Log success
+        alert("Email successfully removed from the database.");
+        setDeleteEmail("");
+      })
+      .catch((error) => {
+        console.error("Error during deletion:", error.message); // Log errors
+        alert(`Error: ${error.message}`);
+      })
+      .finally(() => {
+        console.log("Deletion process completed."); // Log when the process ends
+        setIsPending(false);
       });
   };
 
@@ -69,7 +104,6 @@ const Subscribe = () => {
           required
           value={name}
           onChange={(e) => {
-            console.log("Name input changed:", e.target.value); // Log name input changes
             setName(e.target.value);
           }}
         />
@@ -79,14 +113,12 @@ const Subscribe = () => {
           required
           value={email}
           onChange={(e) => {
-            console.log("Email input changed:", e.target.value); // Log email input changes
             setEmail(e.target.value);
           }}
         />
         {!isPending && <button>Subscribe</button>}
         {isPending && <button disabled>Subscribing...</button>}
       </form>
-
       {/* Confirmation Dialog */}
       {showConfirm && (
         <div className="dialog-backdrop">
@@ -108,6 +140,27 @@ const Subscribe = () => {
           </div>
         </div>
       )}
+      <br />
+      <hr /> <br />
+      <h2>Delete Subscription</h2>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleDelete();
+        }}
+      >
+        <label>Enter your email to delete subscription:</label>
+        <input
+          type="email"
+          required
+          value={deleteEmail}
+          onChange={(e) => {
+            setDeleteEmail(e.target.value);
+          }}
+        />
+        {!isPending && <button>Delete</button>}
+        {isPending && <button disabled>Deleting...</button>}
+      </form>
     </div>
   );
 };

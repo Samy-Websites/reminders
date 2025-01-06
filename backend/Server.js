@@ -3,7 +3,7 @@ const nodemailer = require("nodemailer");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const jsonServer = require("json-server");
-const config = require("./config"); // Import the config file
+const config = require("./config");
 const fs = require("fs");
 const path = require("path");
 
@@ -31,32 +31,29 @@ const transporter = nodemailer.createTransport({
 
 // Route to handle subscription
 app.post("/subscribe", async (req, res) => {
-  console.log("POST /subscribe called"); // Log to confirm route is hit
+  console.log("POST /subscribe called");
   const { name, email } = req.body;
 
   if (!name || !email) {
-    console.log("Missing name or email"); // Log missing fields
+    console.log("Missing name or email");
     return res.status(400).json({ error: "Name and email are required." });
   }
 
   // Email content
   const mailOptions = {
-    from: '"Reminders App" <no-reply@reminders.com>', // Sender address
-    to: email, // Receiver's email address
+    from: '"Reminders App" <no-reply@reminders.com>',
+    to: email,
     subject: "Welcome to Reminders!",
-    text: `Hi ${name}, thank you for subscribing to Reminders!`, // Plain text content
-    html: `<p>Hi <b>${name}</b>, thank you for subscribing to Reminders!</p>`, // HTML content
+    text: `Hi ${name}, thank you for subscribing to Reminders!`,
+    html: `<p>Hi <b>${name}</b>, thank you for subscribing to Reminders!</p>`,
   };
 
   try {
-    // Send the email
-    console.log("Sending email to:", email); // Log email sending
+    console.log("Sending email to:", email);
     const info = await transporter.sendMail(mailOptions);
     console.log("Message sent:", info.messageId);
-    console.log("Preview URL:", nodemailer.getTestMessageUrl(info)); // Preview URL for testing
+    console.log("Preview URL:", nodemailer.getTestMessageUrl(info));
 
-    // Read current subscribers
-    console.log("Reading subscribers.json");
     fs.readFile(subscribersPath, "utf8", (err, data) => {
       if (err) {
         console.error("Error reading subscribers file:", err);
@@ -75,12 +72,9 @@ app.post("/subscribe", async (req, res) => {
           .json({ error: "Server error while parsing subscribers file." });
       }
 
-      // Add the new subscriber
-      console.log("Adding subscriber:", { name, email }); // Log the new subscriber
+      console.log("Adding subscriber:", { name, email });
       subscribers.push({ name, email });
 
-      // Write back to the file
-      console.log("Writing to subscribers.json");
       fs.writeFile(
         subscribersPath,
         JSON.stringify(subscribers, null, 2),
@@ -92,7 +86,7 @@ app.post("/subscribe", async (req, res) => {
               .json({ error: "Server error while saving subscriber." });
           }
 
-          console.log("Subscription saved successfully"); // Log successful write
+          console.log("Subscription saved successfully");
           res.status(201).json({
             message: "Subscription successful!",
             previewUrl: nodemailer.getTestMessageUrl(info),
@@ -106,8 +100,58 @@ app.post("/subscribe", async (req, res) => {
   }
 });
 
+// DELETE route to handle unsubscription
+app.delete("/subscribe/:email", (req, res) => {
+  const email = req.params.email;
+  console.log("Received DELETE request for email:", email);
+
+  fs.readFile(subscribersPath, "utf8", (err, data) => {
+    if (err) {
+      console.error("Error reading subscribers file:", err);
+      return res
+        .status(500)
+        .json({ error: "Server error while reading subscribers file." });
+    }
+
+    let subscribers = [];
+    try {
+      subscribers = JSON.parse(data);
+    } catch (parseErr) {
+      console.error("Error parsing subscribers file:", parseErr);
+      return res
+        .status(500)
+        .json({ error: "Server error while parsing subscribers file." });
+    }
+
+    const updatedSubscribers = subscribers.filter(
+      (subscriber) => subscriber.email !== email
+    );
+
+    if (subscribers.length === updatedSubscribers.length) {
+      console.log("Email not found in subscribers list:", email);
+      return res.status(404).json({ error: "Email not found." });
+    }
+
+    fs.writeFile(
+      subscribersPath,
+      JSON.stringify(updatedSubscribers, null, 2),
+      (writeErr) => {
+        if (writeErr) {
+          console.error("Error writing updated subscribers file:", writeErr);
+          return res
+            .status(500)
+            .json({ error: "Server error while updating subscribers file." });
+        }
+
+        console.log("Successfully deleted email:", email);
+        res.status(200).json({ message: "Subscription deleted successfully." });
+      }
+    );
+  });
+});
+
 // Set up JSON Server for the database
-const router = jsonServer.router(config.dbPath); // Use the centralized database path
+const router = jsonServer.router(config.dbPath);
 app.use("/api", router);
 
 // Start the server
