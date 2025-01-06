@@ -148,6 +148,7 @@ const Subscribe = () => {
       )}
       <br />
       <hr />
+      <br />
       <h2>Delete Subscription</h2>
       <form
         onSubmit={(e) => {
@@ -187,14 +188,30 @@ const Subscribe = () => {
       )}
       <br />
       <hr />
-      <h2>Subscribers List</h2>
-      <ul>
-        {subscribers.map((subscriber) => (
-          <li key={subscriber.email}>
-            <strong>{subscriber.name}</strong>: {subscriber.email}
-          </li>
-        ))}
-      </ul>
+      <br />
+      <div className="create">
+        <h2>Subscribers Table</h2>
+        {subscribers.length > 0 ? (
+          <table className="subscribers-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+              </tr>
+            </thead>
+            <tbody>
+              {subscribers.map((subscriber, index) => (
+                <tr key={index}>
+                  <td>{subscriber.name}</td>
+                  <td>{subscriber.email}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p>No subscribers yet.</p>
+        )}
+      </div>
     </div>
   );
 };

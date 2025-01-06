@@ -268,3 +268,49 @@
 .dialog-backdrop > * {
   z-index: 1010;
 }
+
+/* Subscribers Table */
+.subscribers-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-family: "Quicksand", sans-serif;
+}
+
+.subscribers-table th, 
+.subscribers-table td {
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.subscribers-table th {
+  background-color: #f1356d; /* Matches existing color scheme */
+  color: white;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.subscribers-table tr:nth-child(even) {
+  background-color: #f9f9f9; /* Light gray for even rows */
+}
+
+.subscribers-table tr:nth-child(odd) {
+  background-color: #fff; /* White for odd rows */
+}
+
+.subscribers-table tr:hover {
+  background-color: rgba(241, 53, 109, 0.1); /* Subtle hover effect */
+}
+
+.subscribers-table td {
+  color: #333; /* Matches base text color */
+  font-size: 14px;
+}
+
+.table-title {
+  color: #f1356d; /* Matches primary title color */
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 600;
+}
