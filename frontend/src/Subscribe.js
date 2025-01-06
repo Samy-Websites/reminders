@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SUBSCRIBERS_URL } from "./Config";
 
 const Subscribe = () => {
@@ -7,95 +7,112 @@ const Subscribe = () => {
   const [isPending, setIsPending] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleteEmail, setDeleteEmail] = useState(""); // For deletion
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); // Delete confirmation
+  const [subscribers, setSubscribers] = useState([]); // List of subscribers
+
+  useEffect(() => {
+    // Fetch the list of subscribers
+    fetch(SUBSCRIBERS_URL)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setSubscribers(data);
+      })
+      .catch((error) => console.error("Error fetching subscribers:", error));
+  }, []);
 
   const handleSubmit = () => {
-    console.log("Subscription confirmed."); // Log when subscription starts
     setIsPending(true);
-
     const subscriptionData = { name, email };
-    console.log("Sending data to backend:", subscriptionData); // Log data being sent
 
-    // Send data to the backend
     fetch(SUBSCRIBERS_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(subscriptionData),
     })
       .then((response) => {
-        console.log("Response received:", response); // Log the raw response
-
         if (!response.ok) {
-          console.error("Failed response:", response.statusText); // Log failed response
           return response.json().then((data) => {
             throw new Error(data.error || "Failed to subscribe");
           });
         }
-
-        return response.json(); // Parse JSON if response is OK
+        return response.json();
       })
       .then((data) => {
-        console.log("Subscription successful:", data); // Log the success response
+        console.log("Subscription successful. Preview URL:", data.previewUrl);
         alert("Subscription successful! Check your email.");
+        setSubscribers((prevSubscribers) => [
+          ...prevSubscribers,
+          subscriptionData,
+        ]);
         setName("");
         setEmail("");
       })
       .catch((error) => {
-        console.error("Error occurred during subscription:", error.message); // Log errors
         alert(`Error: ${error.message}`);
       })
       .finally(() => {
-        console.log("Subscription process completed."); // Log when the process ends
         setIsPending(false);
         setShowConfirm(false);
       });
   };
 
   const handleDelete = () => {
-    console.log("Deletion requested for email:", deleteEmail); // Log deletion request
     setIsPending(true);
 
-    // Send DELETE request to the backend
     fetch(`${SUBSCRIBERS_URL}/${deleteEmail}`, {
       method: "DELETE",
     })
       .then((response) => {
-        console.log("Delete response received:", response); // Log delete response
-
         if (!response.ok) {
-          console.error("Failed to delete:", response.statusText); // Log failed deletion
           return response.json().then((data) => {
             throw new Error(data.error || "Failed to delete email");
           });
         }
-
-        return response.json(); // Parse JSON if response is OK
+        return response.json();
       })
-      .then((data) => {
-        console.log("Deletion successful:", data); // Log success
+      .then(() => {
         alert("Email successfully removed from the database.");
-        setDeleteEmail("");
+        setSubscribers((prevSubscribers) =>
+          prevSubscribers.filter(
+            (subscriber) => subscriber.email !== deleteEmail
+          )
+        );
+
+        // Send farewell email
+        return fetch(`${SUBSCRIBERS_URL}/send-farewell`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: deleteEmail }),
+        });
+      })
+      .then((response) => response.json())
+      .then((emailData) => {
+        console.log("Farewell email sent. Preview URL:", emailData.previewUrl);
+        alert("Farewell email sent!");
       })
       .catch((error) => {
-        console.error("Error during deletion:", error.message); // Log errors
         alert(`Error: ${error.message}`);
       })
       .finally(() => {
-        console.log("Deletion process completed."); // Log when the process ends
         setIsPending(false);
+        setShowDeleteConfirm(false);
+        setDeleteEmail("");
       });
-  };
-
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form submitted with name:", name, "and email:", email); // Log form submission
-    setShowConfirm(true); // Show confirmation dialog
   };
 
   return (
     <div className="create">
       <h2>Subscribe</h2>
       <form
-        onSubmit={handleFormSubmit}
+        onSubmit={(e) => {
+          e.preventDefault();
+          setShowConfirm(true);
+        }}
         style={{ filter: showConfirm ? "blur(4px)" : "none" }}
       >
         <label>Your Name:</label>
@@ -103,23 +120,18 @@ const Subscribe = () => {
           type="text"
           required
           value={name}
-          onChange={(e) => {
-            setName(e.target.value);
-          }}
+          onChange={(e) => setName(e.target.value)}
         />
         <label>Your Email:</label>
         <input
           type="email"
           required
           value={email}
-          onChange={(e) => {
-            setEmail(e.target.value);
-          }}
+          onChange={(e) => setEmail(e.target.value)}
         />
         {!isPending && <button>Subscribe</button>}
         {isPending && <button disabled>Subscribing...</button>}
       </form>
-      {/* Confirmation Dialog */}
       {showConfirm && (
         <div className="dialog-backdrop">
           <div className="dialog">
@@ -128,11 +140,44 @@ const Subscribe = () => {
             <button onClick={handleSubmit} disabled={isPending}>
               Yes, Subscribe
             </button>
+            <button onClick={() => setShowConfirm(false)} disabled={isPending}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+      <br />
+      <hr />
+      <h2>Delete Subscription</h2>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          setShowDeleteConfirm(true);
+        }}
+      >
+        <label>Enter your email to delete subscription:</label>
+        <input
+          type="email"
+          required
+          value={deleteEmail}
+          onChange={(e) => setDeleteEmail(e.target.value)}
+        />
+        {!isPending && <button>Delete</button>}
+        {isPending && <button disabled>Processing...</button>}
+      </form>
+      {showDeleteConfirm && (
+        <div className="dialog-backdrop">
+          <div className="dialog">
+            <h3>Confirm Deletion</h3>
+            <p>
+              Are you sure you want to delete the subscription for{" "}
+              <strong>{deleteEmail}</strong>?
+            </p>
+            <button onClick={handleDelete} disabled={isPending}>
+              Yes, Delete
+            </button>
             <button
-              onClick={() => {
-                console.log("Subscription canceled."); // Log cancellation
-                setShowConfirm(false);
-              }}
+              onClick={() => setShowDeleteConfirm(false)}
               disabled={isPending}
             >
               Cancel
@@ -141,26 +186,15 @@ const Subscribe = () => {
         </div>
       )}
       <br />
-      <hr /> <br />
-      <h2>Delete Subscription</h2>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleDelete();
-        }}
-      >
-        <label>Enter your email to delete subscription:</label>
-        <input
-          type="email"
-          required
-          value={deleteEmail}
-          onChange={(e) => {
-            setDeleteEmail(e.target.value);
-          }}
-        />
-        {!isPending && <button>Delete</button>}
-        {isPending && <button disabled>Deleting...</button>}
-      </form>
+      <hr />
+      <h2>Subscribers List</h2>
+      <ul>
+        {subscribers.map((subscriber) => (
+          <li key={subscriber.email}>
+            <strong>{subscriber.name}</strong>: {subscriber.email}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

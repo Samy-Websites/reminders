@@ -39,7 +39,7 @@ app.post("/subscribe", async (req, res) => {
     return res.status(400).json({ error: "Name and email are required." });
   }
 
-  // Email content
+  // Email content WITH USERNAME
   const mailOptions = {
     from: '"Reminders App" <no-reply@reminders.com>',
     to: email,
@@ -100,7 +100,7 @@ app.post("/subscribe", async (req, res) => {
   }
 });
 
-// DELETE route to handle unsubscription
+// DELETE route to handle unsubscriptions
 app.delete("/subscribe/:email", (req, res) => {
   const email = req.params.email;
   console.log("Received DELETE request for email:", email);
@@ -110,7 +110,7 @@ app.delete("/subscribe/:email", (req, res) => {
       console.error("Error reading subscribers file:", err);
       return res
         .status(500)
-        .json({ error: "Server error while reading subscribers file." });
+        .json({ error: "Server error while reading file." });
     }
 
     let subscribers = [];
@@ -123,14 +123,23 @@ app.delete("/subscribe/:email", (req, res) => {
         .json({ error: "Server error while parsing subscribers file." });
     }
 
-    const updatedSubscribers = subscribers.filter(
-      (subscriber) => subscriber.email !== email
+    // Find the subscriber
+    const subscriber = subscribers.find(
+      (subscriber) => subscriber.email === email
     );
 
-    if (subscribers.length === updatedSubscribers.length) {
+    const user = subscriber.name;
+
+    console.log("Subscriber object retrieved:", subscriber); // Log the subscriber object
+
+    if (!subscriber) {
       console.log("Email not found in subscribers list:", email);
       return res.status(404).json({ error: "Email not found." });
     }
+
+    const updatedSubscribers = subscribers.filter(
+      (subscriber) => subscriber.email !== email
+    );
 
     fs.writeFile(
       subscribersPath,
@@ -140,11 +149,35 @@ app.delete("/subscribe/:email", (req, res) => {
           console.error("Error writing updated subscribers file:", writeErr);
           return res
             .status(500)
-            .json({ error: "Server error while updating subscribers file." });
+            .json({ error: "Server error while updating file." });
         }
 
         console.log("Successfully deleted email:", email);
-        res.status(200).json({ message: "Subscription deleted successfully." });
+
+        // Send the farewell email WITH USERNAME
+        const mailOptions = {
+          from: '"Reminders App" <no-reply@reminders.com>',
+          to: email,
+          subject: "Goodbye from Reminders!",
+          html: `<p>Hi <b>${user}</b>, thank you for subscribing to Reminders!</p>`,
+        };
+
+        transporter.sendMail(mailOptions, (err, info) => {
+          if (err) {
+            console.error("Error sending farewell email:", err);
+            return res
+              .status(500)
+              .json({ error: "Failed to send farewell email." });
+          }
+
+          const previewUrl = nodemailer.getTestMessageUrl(info);
+          console.log("Farewell email sent. Preview URL:", previewUrl);
+
+          res.status(200).json({
+            message: "Subscription deleted successfully.",
+            previewUrl,
+          });
+        });
       }
     );
   });
@@ -157,4 +190,54 @@ app.use("/api", router);
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
+});
+
+app.get("/subscribe", (req, res) => {
+  console.log("GET /subscribe called");
+
+  // Read the subscribers file
+  fs.readFile(subscribersPath, "utf8", (err, data) => {
+    if (err) {
+      console.error("Error reading subscribers file:", err);
+      return res
+        .status(500)
+        .json({ error: "Failed to read subscribers file." });
+    }
+
+    try {
+      const subscribers = JSON.parse(data); // Parse the file content into JSON
+      console.log("Returning subscribers list:", subscribers);
+      res.status(200).json(subscribers); // Send subscribers as JSON
+    } catch (parseErr) {
+      console.error("Error parsing subscribers file:", parseErr);
+      res.status(500).json({ error: "Failed to parse subscribers file." });
+    }
+  });
+});
+
+app.post("/subscribe/send-farewell", (req, res) => {
+  const { email, name } = req.body;
+
+  // Email content
+  const mailOptions = {
+    from: '"Reminders App" <no-reply@reminders.com>',
+    to: email,
+    subject: "Goodbye from Reminders!",
+    html: `<p>Hi {<b>${name || "Subscriber"}}</b>,</p>
+           <p>We're sorry to see you go. You can always subscribe again if you change your mind!</p>`,
+  };
+
+  transporter.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      console.error("Error sending farewell email:", err);
+      return res.status(500).json({ error: "Failed to send farewell email." });
+    }
+
+    // Generate and log the Ethereal preview URL
+    const previewUrl = nodemailer.getTestMessageUrl(info);
+    console.log("Farewell email sent:", info.messageId);
+    console.log("Preview URL for farewell email:", previewUrl);
+
+    res.status(200).json({ previewUrl });
+  });
 });
