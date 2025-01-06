@@ -1,4 +1,3 @@
-````markdown
 # Reminder App
 
 This is a React-based app for managing reminders, with a backend API built using `json-server` for the mock database and a Node.js server.
@@ -9,10 +8,10 @@ This is a React-based app for managing reminders, with a backend API built using
 
 1. **Install Dependencies**:
    Run this in both `frontend/` and `backend/` folders:
+
    ```bash
    npm install
    ```
-````
 
 2. **Start the Backend**:
    In the `backend/` folder, run (in 2 distinct terminals):
