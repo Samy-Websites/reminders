@@ -7,6 +7,8 @@ This is a React-based app for managing reminders, with a backend API deployed on
 
 ---
 
+## ![Website Screenshot](image.png)
+
 ## TL;DR: Quick Start Commands
 
 1. **Install Dependencies**:
