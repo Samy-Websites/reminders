@@ -9,7 +9,7 @@
     },
     {
       "title": "Sab bday",
-      "body": "mai",
+      "body": "She turns 22!",
       "date": "2026-05-28",
       "id": "b42c"
     },
@@ -33,6 +33,13 @@
       "category": "Birthday",
       "date": "2025-11-16",
       "id": "vATNTi4"
+    },
+    {
+      "id": "dgdfgfdf",
+      "title": "Test Reminder",
+      "body": "This is a test reminder.",
+      "category": "Test",
+      "date": "2025-01-07"
     }
   ]
 }

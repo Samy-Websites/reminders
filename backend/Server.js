@@ -250,3 +250,123 @@ app.post("/subscribe/send-farewell", (req, res) => {
     res.status(200).json({ previewUrl });
   });
 });
+
+const cron = require("node-cron");
+
+const remindersPath = path.join(__dirname, "data", "db.json");
+
+// Function to handle daily email tasks
+const dailyTask = () => {
+  console.log("Running daily email task...");
+
+  // Use the current date in UTC
+  const today = new Date().toISOString().split("T")[0];
+  console.log("Today's date (UTC):", today);
+
+  // Load reminders from db.json
+  let reminders = [];
+  try {
+    reminders = JSON.parse(fs.readFileSync(remindersPath, "utf8")).reminders;
+    console.log("Reminders loaded:", reminders);
+  } catch (err) {
+    console.error("Error reading reminders:", err);
+    return;
+  }
+
+  // Filter reminders for today's date
+  const todaysReminders = reminders.filter(
+    (reminder) => reminder.date === today
+  );
+  console.log("Today's reminders:", todaysReminders);
+
+  if (todaysReminders.length === 0) {
+    console.log("No reminders for today.");
+    return;
+  }
+
+  // Load subscribers from subscribers.json
+  let subscribers = [];
+  try {
+    subscribers = JSON.parse(fs.readFileSync(subscribersPath, "utf8"));
+    console.log("Subscribers loaded:", subscribers);
+  } catch (err) {
+    console.error("Error reading subscribers:", err);
+    return;
+  }
+
+  // Send emails to all subscribers for today's reminders
+  todaysReminders.forEach((reminder) => {
+    subscribers.forEach((subscriber) => {
+      console.log(
+        `Preparing email for ${subscriber.email} for reminder: ${reminder.title}`
+      );
+
+      const mailOptions = {
+        from: '"Reminders App" <no-reply@reminders.com>',
+        to: subscriber.email,
+        subject: `Reminder: ${reminder.title}`,
+        html: `
+          <div style="font-family: 'Quicksand', sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+            <h2 style="color: #f1356d; text-align: center;">Hi ${
+              subscriber.name || "there"
+            },</h2>
+            <p style="text-align: center;">We’re sending you a friendly reminder!</p>
+            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+              <tr>
+                <th style="background-color: #f1356d; color: white; padding: 8px; text-align: left; font-weight: 500;">Detail</th>
+                <th style="background-color: #f1356d; color: white; padding: 8px; text-align: left; font-weight: 500;">Information</th>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;">Title</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${
+                  reminder.title
+                }</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;">Category</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${
+                  reminder.category
+                }</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;">Date</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${
+                  reminder.date
+                }</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;">Details</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${
+                  reminder.body
+                }</td>
+              </tr>
+            </table>
+            <p style="margin-top: 20px;">We hope this reminder helps you stay organized. Let us know if you have any questions or feedback!</p>
+            <p style="text-align: center; margin-top: 30px;">
+              <a href="https://your-app-link.com" style="color: white; background-color: #f1356d; padding: 10px 20px; text-decoration: none; border-radius: 8px; display: inline-block;">Visit Reminders App</a>
+            </p>
+            <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
+            <p style="font-size: 0.9em; color: #666; text-align: center;">This email was sent automatically. If you have any concerns, contact us at <a href="mailto:support@remindersapp.com" style="color: #f1356d;">support@remindersapp.com</a>.</p>
+          </div>
+        `,
+      };
+
+      transporter.sendMail(mailOptions, (err, info) => {
+        if (err) {
+          console.error(`Error sending email to ${subscriber.email}:`, err);
+        } else {
+          console.log(
+            `Email sent to ${subscriber.email}: ${nodemailer.getTestMessageUrl(
+              info
+            )}`
+          );
+        }
+      });
+    });
+  });
+};
+
+// Schedule the task to run at midnight every day
+// cron.schedule("0 0 * * *", dailyTask);
+
+cron.schedule("* * * * *", dailyTask);
