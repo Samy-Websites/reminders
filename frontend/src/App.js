@@ -1,6 +1,6 @@
 import Navbar from "./Navbar";
 import Home from "./Home";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Create from "./Create";
 import Contact from "./Contact";
 import ReminderDetails from "./ReminderDetails";
@@ -9,7 +9,12 @@ import Subscribe from "./Subscribe";
 
 function App() {
   return (
-    <Router>
+    <BrowserRouter
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      }}
+    >
       <div className="App">
         <Navbar />
         <div className="content">
@@ -23,7 +28,7 @@ function App() {
           </Routes>
         </div>
       </div>
-    </Router>
+    </BrowserRouter>
   );
 }
 

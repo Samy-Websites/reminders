@@ -1,13 +1,6 @@
 {
   "reminders": [
     {
-      "title": "Sirine's Birthday",
-      "body": "Wish her a happy bday",
-      "category": "Birthday",
-      "date": "2025-11-12",
-      "id": "3"
-    },
-    {
       "id": "79d4",
       "title": "Meriem bday",
       "body": "17 juillet",
@@ -33,6 +26,13 @@
       "category": "Birthday",
       "date": "2025-05-22",
       "id": "Vj-tXms"
+    },
+    {
+      "title": "Sirine's Birthday",
+      "body": "She turns 19",
+      "category": "Birthday",
+      "date": "2025-11-16",
+      "id": "vATNTi4"
     }
   ]
 }

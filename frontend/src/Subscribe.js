@@ -130,7 +130,7 @@ const Subscribe = () => {
           onChange={(e) => setEmail(e.target.value)}
         />
         {!isPending && <button>Subscribe</button>}
-        {isPending && <button disabled>Subscribing...</button>}
+        {isPending && <button disabled>Processing...</button>}
       </form>
       {showConfirm && (
         <div className="dialog-backdrop">

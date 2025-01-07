@@ -18,6 +18,9 @@ This is a React-based app for managing reminders, with a backend API built using
 
    ```bash
    npx json-server --watch data/db.json --port 8000
+   ```
+
+   ```bash
    node server.js
    ```
 
