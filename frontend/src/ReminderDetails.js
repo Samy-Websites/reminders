@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import useFetch from "./useFetch";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import REMINDERS_URL from "./Config";
@@ -40,8 +40,8 @@ const formatDateToUTCString = (date) => {
 const ReminderDetails = () => {
   const db = REMINDERS_URL;
   const { id } = useParams();
-  const { data: reminder, error, isPending } = useFetch(`${db}/${id}`);
-
+  const { data, error, isPending } = useFetch(`${db}`);
+  const [reminders, setReminders] = useState([]);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [category, setCategory] = useState("");
@@ -50,7 +50,16 @@ const ReminderDetails = () => {
   const [showDialog, setShowDialog] = useState(false);
   const [saveDialog, setSaveDialog] = useState(false);
 
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
+
+  // Initialize reminders state with fetched data
+  useEffect(() => {
+    if (data) {
+      setReminders(data);
+    }
+  }, [data]);
+
+  const reminder = reminders.find((reminder) => reminder.id === id);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -68,16 +77,34 @@ const ReminderDetails = () => {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedReminder),
-    }).then(() => {
-      setIsEditing(false);
-      setSaveDialog(false);
-      navigate(0); // Reload the current page to reflect changes
-    });
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to update reminder");
+        }
+        return response.json();
+      })
+      .then(() => {
+        setIsEditing(false);
+        setSaveDialog(false);
+        // Update state locally
+        setReminders((prevReminders) =>
+          prevReminders.map((reminder) =>
+            reminder.id === id ? { ...reminder, ...updatedReminder } : reminder
+          )
+        );
+      })
+      .catch((error) => {
+        console.error("Error updating reminder:", error);
+      });
   };
 
   const handleDelete = () => {
     fetch(`${db}/${id}`, { method: "DELETE" }).then(() => {
-      navigate(-1); // Reload the current page to reflect changes
+      setReminders((prevReminders) =>
+        prevReminders.filter((reminder) => reminder.id !== id)
+      );
+      navigate(-1); // Navigate back to the previous page
     });
   };
 
