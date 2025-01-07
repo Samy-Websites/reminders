@@ -18,8 +18,20 @@ require("dotenv").config();
 // Logs the database path (debugging)
 console.log("Database Path:", config.dbPath);
 
-// Path to subscribers.json
+// Paths to data files
 const subscribersPath = path.join(__dirname, "data", "subscribers.json");
+const remindersPath = path.join(__dirname, "data", "db.json");
+
+// Ensure JSON files exist
+if (!fs.existsSync(subscribersPath)) {
+  console.log("subscribers.json not found. Creating a new file...");
+  fs.writeFileSync(subscribersPath, JSON.stringify([]));
+}
+
+if (!fs.existsSync(remindersPath)) {
+  console.log("db.json not found. Creating a new file...");
+  fs.writeFileSync(remindersPath, JSON.stringify({ reminders: [] }));
+}
 
 // Middleware
 app.use(cors());
@@ -245,8 +257,6 @@ app.get("/subscribe", (req, res) => {
 });
 
 const cron = require("node-cron");
-
-const remindersPath = path.join(__dirname, "data", "db.json");
 
 // Function to handle daily email tasks
 const dailyTask = () => {
