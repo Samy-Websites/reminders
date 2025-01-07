@@ -13,6 +13,8 @@ const path = require("path");
 const app = express();
 const PORT = 5000;
 
+require("dotenv").config();
+
 // Logs the database path (debugging)
 console.log("Database Path:", config.dbPath);
 
@@ -29,8 +31,8 @@ const transporter = nodemailer.createTransport({
   port: 587,
   secure: false, // Use true for port 465
   auth: {
-    user: "reminder892@gmail.com", // Replace with your Gmail address
-    pass: "etdg mnpv ncad ckzi", // Replace with your Gmail App Password
+    user: process.env.EMAIL_USER, // Loaded from .env
+    pass: process.env.EMAIL_PASS, // Loaded from .env
   },
 });
 
@@ -357,6 +359,6 @@ const dailyTask = () => {
 };
 
 // Schedule the task to run at midnight (Ottawa time) every day
-// cron.schedule("0 5 * * *", dailyTask); // Runs at 5:00 AM UTC, midnight in Ottawa
+cron.schedule("0 5 * * *", dailyTask); // Runs at 5:00 AM UTC, midnight in Ottawa
 
-cron.schedule("* * * * *", dailyTask); // For testing purposes, will check the DB every minute
+// cron.schedule("* * * * *", dailyTask); // For testing purposes, will check the DB every minute
