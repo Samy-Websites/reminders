@@ -359,4 +359,4 @@ const dailyTask = () => {
 // Schedule the task to run at midnight (Ottawa time) every day
 // cron.schedule("0 5 * * *", dailyTask); // Runs at 5:00 AM UTC, midnight in Ottawa
 
-cron.schedule("* * * * *", dailyTask); // For testing purposes, will check the DB every minute
+// cron.schedule("* * * * *", dailyTask); // For testing purposes, will check the DB every minute

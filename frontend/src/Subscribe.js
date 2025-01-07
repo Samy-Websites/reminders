@@ -82,18 +82,6 @@ const Subscribe = () => {
             (subscriber) => subscriber.email !== deleteEmail
           )
         );
-
-        // Send farewell email
-        return fetch(`${SUBSCRIBERS_URL}/send-farewell`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: deleteEmail }),
-        });
-      })
-      .then((response) => response.json())
-      .then((emailData) => {
-        console.log("Farewell email sent. Preview URL:", emailData.previewUrl);
-        alert("Farewell email sent!");
       })
       .catch((error) => {
         alert(`Error: ${error.message}`);
