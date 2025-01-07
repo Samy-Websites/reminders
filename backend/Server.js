@@ -34,7 +34,11 @@ if (!fs.existsSync(remindersPath)) {
 }
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://family-reminders.netlify.app", // Replace with your Netlify domain
+  })
+);
 app.use(bodyParser.json());
 
 // Real SMTP transport configuration
