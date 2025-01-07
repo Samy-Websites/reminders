@@ -35,11 +35,11 @@
       "id": "vATNTi4"
     },
     {
-      "id": "dgdfgfdf",
-      "title": "Test Reminder",
-      "body": "This is a test reminder.",
-      "category": "Test",
-      "date": "2025-01-07"
+      "title": "Testing Reminder",
+      "body": "This reminder is just created for testing purposes",
+      "category": "Event",
+      "date": "2025-01-07",
+      "id": "tlsHb83"
     }
   ]
 }

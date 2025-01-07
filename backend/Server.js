@@ -23,13 +23,14 @@ const subscribersPath = path.join(__dirname, "data", "subscribers.json");
 app.use(cors());
 app.use(bodyParser.json());
 
-// -- Remove environment variable usage and define credentials here (as shown in your original code) -- //
+// Real SMTP transport configuration
 const transporter = nodemailer.createTransport({
-  host: "smtp.ethereal.email", // your SMTP host
-  port: 587, // your SMTP port
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false, // Use true for port 465
   auth: {
-    user: "tyreek.langworth43@ethereal.email", // your test user
-    pass: "dpSVEhCTJ3Wqrmnhy1", // your test password
+    user: "reminder892@gmail.com", // Replace with your Gmail address
+    pass: "etdg mnpv ncad ckzi", // Replace with your Gmail App Password
   },
 });
 
@@ -46,18 +47,28 @@ app.post("/subscribe", async (req, res) => {
 
   // Email content WITH USERNAME
   const mailOptions = {
-    from: '"Reminders App" <no-reply@reminders.com>',
+    from: '"Reminders App" <reminder892@gmail.com>',
     to: email,
     subject: "Welcome to Reminders!",
     text: `Hi ${name}, thank you for subscribing to Reminders!`,
-    html: `<p>Hi <b>${name}</b>, thank you for subscribing to Reminders!</p>`,
+    html: `
+      <div style="font-family: 'Quicksand', sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+        <h2 style="color: #f1356d; text-align: center;">Welcome to Reminders, ${name}!</h2>
+        <p>Thank you for subscribing to our service. We’re excited to help you stay organized and on top of your important dates!</p>
+        <p style="margin-top: 20px;">Feel free to explore the app and create your first reminder today. Here’s to staying on schedule!</p>
+        <p style="text-align: center; margin-top: 30px;">
+          <a href="https://family-reminders.netlify.app/" style="color: white; background-color: #f1356d; padding: 10px 20px; text-decoration: none; border-radius: 8px; display: inline-block;">Visit Reminders App</a>
+        </p>
+        <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
+        <p style="font-size: 0.9em; color: #666; text-align: center;">This email was sent automatically. If you have any concerns, contact us at <a href="mailto:support@remindersapp.com" style="color: #f1356d;">support@remindersapp.com</a>.</p>
+      </div>
+    `,
   };
 
   try {
     console.log("Sending email to:", email);
     const info = await transporter.sendMail(mailOptions);
     console.log("Message sent:", info.messageId);
-    console.log("Preview URL:", nodemailer.getTestMessageUrl(info));
 
     fs.readFile(subscribersPath, "utf8", (err, data) => {
       if (err) {
@@ -94,7 +105,6 @@ app.post("/subscribe", async (req, res) => {
           console.log("Subscription saved successfully");
           res.status(201).json({
             message: "Subscription successful!",
-            previewUrl: nodemailer.getTestMessageUrl(info),
           });
         }
       );
@@ -161,13 +171,22 @@ app.delete("/subscribe/:email", (req, res) => {
 
         console.log("Successfully deleted email:", email);
 
-        // Send the farewell email WITH USERNAME
         const mailOptions = {
-          from: '"Reminders App" <no-reply@reminders.com>',
+          from: '"Reminders App" <samy@reminders.com>',
           to: email,
           subject: "Goodbye from Reminders!",
-          html: `<p>Hi <b>${userName}</b>,</p>
-                 <p>We're sorry to see you go. You can always subscribe again if you change your mind!</p>`,
+          html: `
+            <div style="font-family: 'Quicksand', sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+              <h2 style="color: #f1356d; text-align: center;">Goodbye, ${userName}!</h2>
+              <p>We’re sorry to see you go. Your subscription to Reminders has been canceled.</p>
+              <p style="margin-top: 20px;">If you change your mind, you’re always welcome to come back. We’ll be here to help you stay organized and on top of your important dates.</p>
+              <p style="text-align: center; margin-top: 30px;">
+                <a href="https://family-reminders.netlify.app/" style="color: white; background-color: #f1356d; padding: 10px 20px; text-decoration: none; border-radius: 8px; display: inline-block;">Resubscribe to Reminders</a>
+              </p>
+              <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
+              <p style="font-size: 0.9em; color: #666; text-align: center;">This email was sent automatically. If you have any concerns, contact us at <a href="mailto:support@remindersapp.com" style="color: #f1356d;">support@remindersapp.com</a>.</p>
+            </div>
+          `,
         };
 
         transporter.sendMail(mailOptions, (err, info) => {
@@ -220,34 +239,6 @@ app.get("/subscribe", (req, res) => {
       console.error("Error parsing subscribers file:", parseErr);
       res.status(500).json({ error: "Failed to parse subscribers file." });
     }
-  });
-});
-
-// Route to manually send a farewell email
-app.post("/subscribe/send-farewell", (req, res) => {
-  const { email, name } = req.body;
-
-  // Email content
-  const mailOptions = {
-    from: '"Reminders App" <no-reply@reminders.com>',
-    to: email,
-    subject: "Goodbye from Reminders!",
-    html: `<p>Hi <b>${name || "Subscriber"}</b>,</p>
-           <p>We're sorry to see you go. You can always subscribe again if you change your mind!</p>`,
-  };
-
-  transporter.sendMail(mailOptions, (err, info) => {
-    if (err) {
-      console.error("Error sending farewell email:", err);
-      return res.status(500).json({ error: "Failed to send farewell email." });
-    }
-
-    // Generate and log the Ethereal preview URL
-    const previewUrl = nodemailer.getTestMessageUrl(info);
-    console.log("Farewell email sent:", info.messageId);
-    console.log("Preview URL for farewell email:", previewUrl);
-
-    res.status(200).json({ previewUrl });
   });
 });
 
@@ -343,7 +334,7 @@ const dailyTask = () => {
             </table>
             <p style="margin-top: 20px;">We hope this reminder helps you stay organized. Let us know if you have any questions or feedback!</p>
             <p style="text-align: center; margin-top: 30px;">
-              <a href="https://your-app-link.com" style="color: white; background-color: #f1356d; padding: 10px 20px; text-decoration: none; border-radius: 8px; display: inline-block;">Visit Reminders App</a>
+              <a href="https://family-reminders.netlify.app/" style="color: white; background-color: #f1356d; padding: 10px 20px; text-decoration: none; border-radius: 8px; display: inline-block;">Visit Reminders App</a>
             </p>
             <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
             <p style="font-size: 0.9em; color: #666; text-align: center;">This email was sent automatically. If you have any concerns, contact us at <a href="mailto:support@remindersapp.com" style="color: #f1356d;">support@remindersapp.com</a>.</p>
@@ -353,13 +344,12 @@ const dailyTask = () => {
 
       transporter.sendMail(mailOptions, (err, info) => {
         if (err) {
-          console.error(`Error sending email to ${subscriber.email}:`, err);
-        } else {
-          console.log(
-            `Email sent to ${subscriber.email}: ${nodemailer.getTestMessageUrl(
-              info
-            )}`
+          console.error(
+            `Error sending email to ${subscriber.email}:`,
+            err.message
           );
+        } else {
+          console.log(`Email successfully sent to ${subscriber.email}`);
         }
       });
     });
