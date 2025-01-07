@@ -1,6 +1,9 @@
 # Reminder App
 
-This is a React-based app for managing reminders, with a backend API built using `json-server` for the mock database and a Node.js server.
+This is a React-based app for managing reminders, with a backend API deployed on Render and a frontend hosted on Netlify.
+
+- **Frontend Link**: [https://family-reminders.netlify.app/](https://family-reminders.netlify.app/)
+- **Backend Link**: [https://reminders-backend.onrender.com](https://reminders-backend.onrender.com)
 
 ---
 
@@ -98,6 +101,19 @@ npm install
    This serves the app at `http://localhost:3000`.
 
 ---
+
+### Additional Step
+
+Configure Email Credentials
+Create a .env file in the backend folder.
+Add the following environment variables for email functionality:
+
+```bash
+EMAIL_USER=your-email@example.com
+EMAIL_PASS=your-email-password
+```
+
+These are required for sending emails via the backend.
 
 ### API Endpoints
 
