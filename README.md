@@ -5,6 +5,11 @@ This is a React-based app for managing reminders, with a backend API deployed on
 - **Frontend Link**: [https://family-reminders.netlify.app/](https://family-reminders.netlify.app/)
 - **Backend Link**: [https://reminders-backend.onrender.com](https://reminders-backend.onrender.com)
 
+Manage API and frontend
+
+- **Frontend Link**: [Netlify](https://app.netlify.com/sites/family-reminders/overview)
+- **Backend Link**: [Render](https://dashboard.render.com/web/srv-ctubanpu0jms73f5ihcg/deploys/dep-ctubanpu0jms73f5ihg0?r=4h)
+
 ---
 
 ## ![Website Screenshot](image.png)
