@@ -7,7 +7,6 @@ const nodemailer = require("nodemailer");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const Subscribers = require("./models/Subscribers"); // MongoDB model for subscribers
-const jsonServer = require("json-server");
 const config = require("./config");
 const fs = require("fs");
 const path = require("path");
@@ -152,10 +151,6 @@ app.delete("/subscribe/:email", async (req, res) => {
     res.status(500).json({ error: "Failed to unsubscribe." });
   }
 });
-
-// Set up JSON Server for the database
-const router = jsonServer.router(config.dbPath);
-app.use("/api", router);
 
 // Start the server
 app.listen(PORT, () => {
