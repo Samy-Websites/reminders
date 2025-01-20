@@ -30,10 +30,21 @@ if (!fs.existsSync(remindersPath)) {
   fs.writeFileSync(remindersPath, JSON.stringify({ reminders: [] }));
 }
 
-// Middleware
+// Allow requests from localhost:3000 and your Netlify domain
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://family-reminders.netlify.app", // Replace with your actual Netlify URL
+];
+
 app.use(
   cors({
-    origin: "https://family-reminders.netlify.app", // Replace with your Netlify domain
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
   })
 );
 
