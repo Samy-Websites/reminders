@@ -9,6 +9,7 @@ Manage API and frontend
 
 - **Frontend Link**: [Netlify](https://app.netlify.com/sites/family-reminders/overview)
 - **Backend Link**: [Render](https://dashboard.render.com/web/srv-cu7d673qf0us73e4a8j0/deploys/dep-cu7d67bqf0us73e4a8mg)
+- **Database Link**: [MongoDB](https://cloud.mongodb.com/v2/678d422bb5966b0ad6196960#/metrics/replicaSet/678d431cdea7ee35c34262e1/explorer/reminders/reminders/find)
 
 ---
 
@@ -24,11 +25,7 @@ Manage API and frontend
    ```
 
 2. **Start the Backend**:
-   In the `backend/` folder, run (in 2 distinct terminals):
-
-   ```bash
-   npx json-server --watch data/db.json --port 8000
-   ```
+   In the `backend/` folder, run:
 
    ```bash
    node server.js
@@ -45,6 +42,8 @@ Manage API and frontend
    - Frontend: `http://localhost:3000/`
    - Mock Database: `http://localhost:8000/reminders`
    - Backend API: `http://localhost:5000/api/reminders`
+   - Test Sending Emails to Subscribers Locally: `http://localhost:5000/test-daily-task`
+   - Test Sending Emails to Subscribers Online: `https://reminders-backend2.onrender.com/test-daily-task`
 
 ---
 
