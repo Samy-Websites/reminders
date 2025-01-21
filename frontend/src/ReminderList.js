@@ -6,8 +6,8 @@ const ReminderList = ({ reminders, title }) => {
       <h1> {title} </h1>
       <hr />
       {reminders.map((reminder) => (
-        <div className="reminder-preview" key={reminder.id}>
-          <Link to={`/reminders/${reminder.id}`}>
+        <div className="reminder-preview" key={reminder._id}>
+          <Link to={`/reminders/${reminder._id}`}>
             <h2>{reminder.title}</h2>
             <p>Date: {reminder.date}</p>
           </Link>
