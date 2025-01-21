@@ -4,7 +4,7 @@ const router = express.Router();
 
 // Create a new reminder
 router.post("/reminders", async (req, res) => {
-  //   console.log("Request Body:", req.body); // Add this line
+  console.log("Request Body:", req.body); // Log the incoming request body
   try {
     const reminder = new Reminder(req.body);
     await reminder.save();
@@ -12,6 +12,7 @@ router.post("/reminders", async (req, res) => {
       .status(201)
       .json({ message: "Reminder created successfully", reminder });
   } catch (error) {
+    console.error("Error:", error.message); // Log the error
     res.status(400).json({ error: error.message });
   }
 });

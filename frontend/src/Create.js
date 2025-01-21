@@ -14,6 +14,7 @@ const Create = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     const formattedDate = date
       ? `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(
           2,
@@ -29,11 +30,22 @@ const Create = () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(reminder),
-    }).then(() => {
-      console.log("New reminder added");
-      setIsPending(false);
-      navigate("/"); // Navigate to the homepage after adding a reminder
-    });
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to add reminder");
+        }
+        return response.json();
+      })
+      .then(() => {
+        console.log("New reminder added");
+        setIsPending(false);
+        navigate("/"); // Navigate to the homepage after adding a reminder
+      })
+      .catch((error) => {
+        console.error("Error:", error.message);
+        setIsPending(false);
+      });
   };
 
   return (

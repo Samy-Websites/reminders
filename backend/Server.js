@@ -7,6 +7,7 @@ const nodemailer = require("nodemailer");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const Subscribers = require("./models/Subscribers"); // MongoDB model for subscribers
+const Reminder = require("./models/Reminders");
 const config = require("./config");
 const fs = require("fs");
 const path = require("path");
@@ -15,20 +16,7 @@ const app = express();
 const PORT = 5000;
 
 require("dotenv").config();
-
 app.use(bodyParser.json());
-
-const remindersRouter = require("./routes/reminders");
-app.use("/api", remindersRouter);
-
-// Paths to data files
-const remindersPath = path.join(__dirname, "data", "db.json");
-
-// Ensure JSON files exist
-if (!fs.existsSync(remindersPath)) {
-  console.log("db.json not found. Creating a new file...");
-  fs.writeFileSync(remindersPath, JSON.stringify({ reminders: [] }));
-}
 
 // Allow requests from localhost:3000 and your Netlify domain
 const allowedOrigins = [
@@ -47,6 +35,9 @@ app.use(
     },
   })
 );
+
+const remindersRouter = require("./routes/reminders");
+app.use("/api", remindersRouter);
 
 // Real SMTP transport configuration
 const transporter = nodemailer.createTransport({
@@ -171,56 +162,32 @@ app.listen(PORT, () => {
 const cron = require("node-cron");
 
 // Function to handle daily email tasks
-const dailyTask = () => {
+const dailyTask = async () => {
   console.log("Running daily email task...");
 
-  // Use the current date in UTC
   const today = new Date().toISOString().split("T")[0];
   console.log("Today's date (UTC):", today);
 
-  // Load reminders from db.json
-  let reminders = [];
   try {
-    reminders = JSON.parse(fs.readFileSync(remindersPath, "utf8")).reminders;
-    console.log("Reminders loaded:", reminders);
-  } catch (err) {
-    console.error("Error reading reminders:", err);
-    return;
-  }
-
-  // Filter reminders for today's date
-  const todaysReminders = reminders.filter(
-    (reminder) => reminder.date === today
-  );
-  console.log("Today's reminders:", todaysReminders);
-
-  if (todaysReminders.length === 0) {
-    console.log("No reminders for today.");
-    return;
-  }
-
-  // Load subscribers from MongoDB
-  Subscribers.find({}, (err, subscribers) => {
-    if (err) {
-      console.error("Error retrieving subscribers:", err);
+    // Query reminders for today's date from MongoDB
+    const reminders = await Reminder.find({ date: today });
+    if (reminders.length === 0) {
+      console.log("No reminders for today.");
       return;
     }
 
+    // Query all subscribers from MongoDB
+    const subscribers = await Subscribers.find({});
     console.log("Subscribers loaded:", subscribers);
 
-    // Send emails to all subscribers for today's reminders
-    todaysReminders.forEach((reminder) => {
+    reminders.forEach((reminder) => {
       subscribers.forEach((subscriber) => {
-        console.log(
-          `Preparing email for ${subscriber.email} for reminder: ${reminder.title}`
-        );
-
         const mailOptions = {
           from: '"Reminders App" <no-reply@reminders.com>',
           to: subscriber.email,
           subject: `Reminder: ${reminder.title}`,
           html: `
-            <div style="font-family: 'Quicksand', sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+            <div style="font-family: 'Quicksand', sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
               <h2 style="color: #f1356d; text-align: center;">Hi ${
                 subscriber.name || "there"
               },</h2>
@@ -260,25 +227,34 @@ const dailyTask = () => {
                 <a href="https://family-reminders.netlify.app/" style="color: white; background-color: #f1356d; padding: 10px 20px; text-decoration: none; border-radius: 8px; display: inline-block;">Visit Reminders App</a>
               </p>
               <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
-              <p style="font-size: 0.9em; color: #666; text-align: center;">This email was sent automatically. If you have any concerns, contact us at <a href="mailto:xavier.lallonde@gmail.com" style="color: #f1356d;">xavier.lallonde@gmail.com</a>.</p>
+              <p style="font-size: 0.9em; color: #666; text-align: center;">This email was sent automatically. If you have any concerns, contact us at <a href="mailto:support@remindersapp.com" style="color: #f1356d;">support@remindersapp.com</a>.</p>
             </div>
           `,
         };
 
-        transporter.sendMail(mailOptions, (err, info) => {
+        transporter.sendMail(mailOptions, (err) => {
           if (err) {
-            console.error(
-              `Error sending email to ${subscriber.email}:`,
-              err.message
-            );
+            console.error(`Error sending email to ${subscriber.email}:`, err);
           } else {
-            console.log(`Email successfully sent to ${subscriber.email}`);
+            console.log(`Email sent to ${subscriber.email}`);
           }
         });
       });
     });
-  });
+  } catch (error) {
+    console.error("Error running daily task:", error);
+  }
 };
+
+app.get("/test-daily-task", async (req, res) => {
+  try {
+    await dailyTask();
+    res.status(200).send("Daily task executed successfully.");
+  } catch (error) {
+    console.error("Error executing daily task:", error);
+    res.status(500).send("Error executing daily task.");
+  }
+});
 
 // Schedule the task to run at midnight (Ottawa time) every day
 cron.schedule("0 5 * * *", dailyTask); // Runs at 5:00 AM UTC, midnight in Ottawa
