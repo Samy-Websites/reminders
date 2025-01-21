@@ -21,7 +21,7 @@ app.use(bodyParser.json());
 // Allow requests from localhost:3000 and your Netlify domain
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://family-reminders.netlify.app", // Replace with your actual Netlify URL
+  "https://family-reminders.netlify.app",
 ];
 
 app.use(
