@@ -178,7 +178,9 @@ const dailyTask = async () => {
 
     // Query all subscribers from MongoDB
     const subscribers = await Subscribers.find({});
-    console.log("Subscribers loaded:", subscribers);
+    console.log(
+      `Processing ${reminders.length} reminders for ${subscribers.length} subscribers.`
+    );
 
     reminders.forEach((reminder) => {
       subscribers.forEach((subscriber) => {
@@ -191,11 +193,11 @@ const dailyTask = async () => {
               <h2 style="color: #f1356d; text-align: center;">Hi ${
                 subscriber.name || "there"
               },</h2>
-              <p style="text-align: center;">We’re sending you a friendly reminder!</p>
+              <p>We’re sending you a friendly reminder!</p>
               <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
                 <tr>
-                  <th style="background-color: #f1356d; color: white; padding: 8px; text-align: left; font-weight: 500;">Detail</th>
-                  <th style="background-color: #f1356d; color: white; padding: 8px; text-align: left; font-weight: 500;">Information</th>
+                  <th style="background-color: #f1356d; color: white; padding: 8px;">Detail</th>
+                  <th style="background-color: #f1356d; color: white; padding: 8px;">Information</th>
                 </tr>
                 <tr>
                   <td style="padding: 8px; border: 1px solid #ddd;">Title</td>
@@ -222,25 +224,21 @@ const dailyTask = async () => {
                   }</td>
                 </tr>
               </table>
-              <p style="margin-top: 20px;">We hope this reminder helps you stay organized. Let us know if you have any questions or feedback!</p>
-              <p style="text-align: center; margin-top: 30px;">
-                <a href="https://family-reminders.netlify.app/" style="color: white; background-color: #f1356d; padding: 10px 20px; text-decoration: none; border-radius: 8px; display: inline-block;">Visit Reminders App</a>
-              </p>
-              <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
-              <p style="font-size: 0.9em; color: #666; text-align: center;">This email was sent automatically. If you have any concerns, contact us at <a href="mailto:support@remindersapp.com" style="color: #f1356d;">support@remindersapp.com</a>.</p>
             </div>
           `,
         };
 
         transporter.sendMail(mailOptions, (err) => {
           if (err) {
-            console.error(`Error sending email to ${subscriber.email}:`, err);
-          } else {
-            console.log(`Email sent to ${subscriber.email}`);
+            console.error(
+              `Error sending email for reminder: ${reminder.title}`
+            );
           }
         });
       });
     });
+
+    console.log("Daily task completed successfully.");
   } catch (error) {
     console.error("Error running daily task:", error);
   }
@@ -257,6 +255,7 @@ app.get("/test-daily-task", async (req, res) => {
 });
 
 // Schedule the task to run at midnight (Ottawa time) every day
-cron.schedule("0 5 * * *", dailyTask); // Runs at 5:00 AM UTC, midnight in Ottawa
+// cron.schedule("0 5 * * *", dailyTask); // Runs at 5:00 AM UTC, midnight in Ottawa
+// Above line was commented out because i will use an external scheduler
 
 // cron.schedule("* * * * *", dailyTask); // For testing purposes, will check the DB every minute
