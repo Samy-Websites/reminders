@@ -10,6 +10,8 @@ Manage API and frontend
 - **Frontend Link**: [Netlify](https://app.netlify.com/sites/family-reminders/overview)
 - **Backend Link**: [Render](https://dashboard.render.com/web/srv-cu7d673qf0us73e4a8j0/deploys/dep-cu7d67bqf0us73e4a8mg)
 - **Database Link**: [MongoDB](https://cloud.mongodb.com/v2/678d422bb5966b0ad6196960#/metrics/replicaSet/678d431cdea7ee35c34262e1/explorer/reminders/reminders/find)
+- **Schedule Reminders Link**: [Cron Jon](https://console.cron-job.org/dashboard)
+- **Keep Server Alive Link**: [UptimeRobot](https://dashboard.uptimerobot.com/monitors#mainDashboard)
 
 ---
 
