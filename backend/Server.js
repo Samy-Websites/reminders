@@ -255,7 +255,7 @@ app.get("/test-daily-task", async (req, res) => {
 });
 
 // Schedule the task to run at midnight (Ottawa time) every day
-// cron.schedule("0 5 * * *", dailyTask); // Runs at 5:00 AM UTC, midnight in Ottawa
-// Above line was commented out because i will use an external scheduler
+cron.schedule("0 5 * * *", dailyTask); // Runs at 5:00 AM UTC, midnight in Ottawa
+// Above line was commented out because i used to use an external scheduler
 
 // cron.schedule("* * * * *", dailyTask); // For testing purposes, will check the DB every minute
